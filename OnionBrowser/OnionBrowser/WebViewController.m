@@ -124,7 +124,10 @@ const char AlertViewIncomingUrl;
     }
     //NSLog(@"%lu", (unsigned long)[[UIScreen mainScreen] bounds].size.height);
 
-    NSString *status = [NSString stringWithFormat:@""
+	AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+	NSUInteger numBridges = [appDelegate numBridgesConfigured];
+
+	NSString *status = [NSString stringWithFormat:@""
       "<html lang='en-us'><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'/><meta charset='utf-8' />"
       "<style type='text/css'>body{font:%upt Helvetica;line-height:1.35em;margin-top:%@} "
       "progress{background:#fff;border:0;height:18px;border-radius:9px;-webkit-appearance:none;appearance:none} "
@@ -136,15 +139,30 @@ const char AlertViewIncomingUrl;
       "<p>%@<br>"
       "<progress max='100' value='%@' style='width:100%%'></progress><br></p>"
       "<p>If this takes longer than a minute, please close and re-open the app.</p>"
-      "<p>If your ISP blocks connections to Tor, you may configure bridges by  "
-      "pressing the middle (settings) button at the bottom of the screen.</p>"
-      "<p>If you continue to have issues, go to:<br><b>onionbrowser.com/help</b>"
-      "</div></body></html>",
+						,
       fontsize,
       margintop,
       progress_str,
       summary_str,
       progress_str];
+
+	if (numBridges == 0) {
+		status = [status stringByAppendingString:@""
+				  "<p>No bridges configured: connecting directly to Tor. If your ISP blocks connections to Tor, you may configure bridges by  "
+				  "pressing the middle (settings) button at the bottom of the screen.</p>"];
+	} else {
+		status = [status stringByAppendingString:[NSString stringWithFormat:@""
+				  "<p>Using %ld configured bridge", (unsigned long)numBridges]];
+		if (numBridges > 1) {
+			status = [status stringByAppendingString:@"s"];
+		}
+		status = [status stringByAppendingString:@". Press the middle (settings) button at the bottom of the screen to edit bridge configuration if you have issues connecting.</p>"];
+	}
+
+	status = [status stringByAppendingString:@""
+			  "<p>If you continue to have issues, go to:<br><b>onionbrowser.com/help</b>"
+			  "</div></body></html>"];
+
 
     //NSLog(@"%@", status);
 
@@ -175,6 +193,13 @@ const char AlertViewIncomingUrl;
 -(void)loadURL: (NSURL *)navigationURL {
     NSString *urlProto = [[navigationURL scheme] lowercaseString];
     if ([urlProto isEqualToString:@"onionbrowser"]||[urlProto isEqualToString:@"onionbrowsers"]||[urlProto isEqualToString:@"about"]||[urlProto isEqualToString:@"http"]||[urlProto isEqualToString:@"https"]) {
+        /* circuit & pluggable transport debugging: */
+        /*
+        NSLog(@"DEBUG: getinfo stream-status");
+        AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+        [appDelegate.tor getCircuitInfo];
+        */
+
         /***** One of our supported protocols *****/
 
         // Cancel any existing nav
@@ -477,14 +502,16 @@ const char AlertViewIncomingUrl;
 
     Bookmark *bookmark;
 
+    // TODO: change these back to /html/ when we figure out why their server
+    //       403's on our POSTs on those versions of the site
     bookmark = (Bookmark *)[NSEntityDescription insertNewObjectForEntityForName:@"Bookmark" inManagedObjectContext:context];
-    [bookmark setTitle:@"Search: DuckDuckGo"];
-    [bookmark setUrl:@"https://3g2upl4pq6kufc4m.onion/html/"];
+    [bookmark setTitle:@"Search: DuckDuckGo (Tor Onion Site)"];
+    [bookmark setUrl:@"http://3g2upl4pq6kufc4m.onion/"];
     [bookmark setOrder:i++];
 
     bookmark = (Bookmark *)[NSEntityDescription insertNewObjectForEntityForName:@"Bookmark" inManagedObjectContext:context];
     [bookmark setTitle:@"Search: DuckDuckGo (Plain HTTPS)"];
-    [bookmark setUrl:@"https://duckduckgo.com/html/"];
+    [bookmark setUrl:@"https://duckduckgo.com/"];
     [bookmark setOrder:i++];
 
     bookmark = (Bookmark *)[NSEntityDescription insertNewObjectForEntityForName:@"Bookmark" inManagedObjectContext:context];
@@ -524,7 +551,7 @@ const char AlertViewIncomingUrl;
 
     bookmark = (Bookmark *)[NSEntityDescription insertNewObjectForEntityForName:@"Bookmark" inManagedObjectContext:context];
     [bookmark setTitle:@"ProPublica.org (.onion)"];
-    [bookmark setUrl:@"http://propub3r6espa33w.onion/"];
+    [bookmark setUrl:@"https://www.propub3r6espa33w.onion/"];
     [bookmark setOrder:i++];
 
     bookmark = (Bookmark *)[NSEntityDescription insertNewObjectForEntityForName:@"Bookmark" inManagedObjectContext:context];
@@ -638,7 +665,7 @@ const char AlertViewIncomingUrl;
         NSURL *failingURL = [error.userInfo objectForKey:@"NSErrorFailingURLKey"];
         UIAlertView* alertView = [[UIAlertView alloc]
                                   initWithTitle:@"Cannot Verify Website Identity"
-                                  message:[NSString stringWithFormat:@"Either the SSL certificate for '%@' is self-signed or the certificate was signed by an untrusted authority.\n\nFor normal websites, it is generally unsafe to proceed.\n\nFor .onion websites (or sites using CACert or self-signed certificates), you may proceed if you think you can trust this website's URL.", url.host]
+                                  message:[NSString stringWithFormat:@"The SSL certificate for '%@' could not be verified.\n\n🔹For .onion sites, you can continue if you are sure that '%@' is the exact domain name of the onion site you are trying to visit.\n\n🔸Otherwise, it may be unsafe to proceed, since the website you are communicating with may not be legitimate.", url.host, url.host]
                                   delegate:nil
                                   cancelButtonTitle:@"Cancel"
                                   otherButtonTitles:@"Continue",nil];
@@ -871,6 +898,7 @@ const char AlertViewIncomingUrl;
 - (void)openOptionsMenu {
     AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
     if (![appDelegate.tor didFirstConnect]) {
+        [appDelegate.tor disableNetwork];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Bridge Configuration"
                                                         message:@"You can configure bridges here if your ISP normally blocks access to Tor.\n\nIf you did not mean to access the Bridge configuration, press \"Cancel\", then \"Restart App\", and then re-launch Onion Browser."
                                                        delegate:nil
@@ -878,11 +906,14 @@ const char AlertViewIncomingUrl;
                                               otherButtonTitles:nil];
         [alert show];
         
-        BridgeViewController *bridgesVC = [[BridgeViewController alloc] init];
+        BridgeViewController *bridgesVC = [[BridgeViewController alloc] initWithStyle:UITableViewStyleGrouped];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:bridgesVC];
         navController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
         [self presentViewController:navController animated:YES completion:nil];
     } else {
+        [_optionsMenu setModalPresentationStyle:UIModalPresentationPopover];
+        _optionsMenu.popoverPresentationController.barButtonItem = _toolButton;
+        _optionsMenu.popoverPresentationController.sourceView = self.view;
         [self presentViewController:_optionsMenu animated:YES completion:nil];
     }
 }
@@ -1188,5 +1219,4 @@ const char AlertViewIncomingUrl;
     [_progressView setProgress:progress animated:YES];
     self.title = [_myWebView stringByEvaluatingJavaScriptFromString:@"document.title"];
 }
-
 @end

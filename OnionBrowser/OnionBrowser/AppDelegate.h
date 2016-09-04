@@ -8,6 +8,7 @@
 #import <UIKit/UIKit.h>
 #import "WebViewController.h"
 #import "TorController.h"
+#import "ObfsWrapper.h"
 
 #define COOKIES_ALLOW_ALL 0
 #define COOKIES_BLOCK_THIRDPARTY 1
@@ -40,6 +41,8 @@
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) TorController *tor;
+@property (strong, nonatomic) ObfsWrapper *obfsproxy;
+
 
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) UIImageView *windowOverlay;
@@ -55,10 +58,15 @@
 @property (nonatomic) NSURL *startUrl;
 
 // list for known domains w/self-signed certs
-@property (nonatomic) NSMutableArray *sslWhitelistedDomains;
+@property (nonatomic) NSMutableSet *sslWhitelistedDomains;
 
 @property (nonatomic) Boolean doPrepopulateBookmarks;
 
+@property (nonatomic) Boolean usingObfs;
+@property (nonatomic) Boolean didLaunchObfsProxy;
+
+- (void)recheckObfsproxy;
+- (NSUInteger) numBridgesConfigured;
 - (void)updateTorrc;
 - (NSURL *)applicationDocumentsDirectory;
 - (void)wipeAppData;

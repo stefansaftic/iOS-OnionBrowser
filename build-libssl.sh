@@ -2,9 +2,10 @@
 #  Builds openssl for all five current iPhone targets: iPhoneSimulator-i386,
 #  iPhoneSimulator-x86_64, iPhoneOS-armv7, iPhoneOS-armv7s, iPhoneOS-arm64.
 #
-#  Copyright 2012 Mike Tigas <mike@tig.as>
+#  Copyright 2012-2016 Mike Tigas <mike AT tig DOT as>
 #
-#  Based on work by Felix Schulze on 16.12.10.
+#  Based on "build-libssl.sh" in OpenSSL-for-iPhone by Felix Schulze,
+#  forked on 2012-02-24. Original license follows:
 #  Copyright 2010 Felix Schulze. All rights reserved.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +23,9 @@
 ###########################################################################
 #  Choose your openssl version and your currently-installed iOS SDK version:
 #
-VERSION="1.0.2d"
-USERSDKVERSION="9.1"
-MINIOSVERSION="8.0"
+VERSION="1.0.2h"
+USERSDKVERSION="9.3"
+MINIOSVERSION="8.2"
 VERIFYGPG=true
 
 ###########################################################################
@@ -45,14 +46,14 @@ DEVELOPER=`xcode-select -print-path`
 if [ "$1" == "--noverify" ]; then
 	VERIFYGPG=false
 fi
-if [ "$2" == "--i386only" ]; then
-	ARCHS="i386"
+if [ "$2" == "--travis" ]; then
+	ARCHS="i386 x86_64"
 fi
 
 if [[ ! -z "$TRAVIS" && $TRAVIS ]]; then
 	# Travis CI highest available version
 	echo "==================== TRAVIS CI ===================="
-	SDKVERSION="9.0"
+	SDKVERSION="9.3"
 else
 	SDKVERSION="$USERSDKVERSION"
 fi
@@ -83,7 +84,7 @@ set -e
 
 if [ ! -e "${SRCDIR}/openssl-${VERSION}.tar.gz" ]; then
 	echo "Downloading openssl-${VERSION}.tar.gz"
-	curl -O http://www.openssl.org/source/openssl-${VERSION}.tar.gz
+	curl -O https://www.openssl.org/source/openssl-${VERSION}.tar.gz
 fi
 echo "Using openssl-${VERSION}.tar.gz"
 
@@ -91,7 +92,7 @@ echo "Using openssl-${VERSION}.tar.gz"
 # up to you to set up `gpg` and add keys to your keychain
 if $VERIFYGPG; then
 	if [ ! -e "${SRCDIR}/openssl-${VERSION}.tar.gz.asc" ]; then
-		curl -O http://www.openssl.org/source/openssl-${VERSION}.tar.gz.asc
+		curl -O https://www.openssl.org/source/openssl-${VERSION}.tar.gz.asc
 	fi
 	echo "Using openssl-${VERSION}.tar.gz.asc"
 	if out=$(gpg --status-fd 1 --verify "openssl-${VERSION}.tar.gz.asc" "openssl-${VERSION}.tar.gz" 2>/dev/null) &&

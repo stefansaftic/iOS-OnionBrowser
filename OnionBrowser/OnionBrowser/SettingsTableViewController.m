@@ -17,20 +17,17 @@
 @implementation SettingsTableViewController
 @synthesize backButton;
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
-    backButton = [[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStyleDone target:self action:@selector(goBack)];
-    self.navigationItem.rightBarButtonItem = backButton;
+	self.title = @"Settings";
 
+	backButton = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStyleDone target:self action:@selector(goBack)];
+    self.navigationItem.leftBarButtonItem = backButton;
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -79,7 +76,7 @@
     else if (section == 1)
         return @"Active Content Blocking\n(Scripts, Media, Ajax, WebSockets, etc)\n★ 'Block Ajax…' Mode Recommended.";
     else if (section == 2)
-        return @"Cookies\n★ 'Block All' recommended, but prevents website logins.";
+        return @"Cookies";
     else if (section == 3) {
         NSString *devicename;
         if (IS_IPAD) {
@@ -92,9 +89,23 @@
         return @"Do Not Track (DNT) Header\nThis does not prevent sites from tracking you: this only tells sites that you prefer not being tracked for customzied advertising.";
     else if (section == 5)
         return @"Minimum SSL/TLS protocol\nNewer TLS protocols are more secure, but might not be supported by all sites.";
-    else if (section == 6)
-        return @"Tor Bridges\nYou click below to configure bridges if your ISP normally blocks connctions to Tor.";
-    else
+	else if (section == 6) {
+		NSString *bridgeMsg = @"Tor Bridges\nUse bridges if your Internet Service Provider (ISP) blocks connections to Tor.";
+
+		AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+		NSUInteger numBridges = [appDelegate numBridgesConfigured];
+
+		if (numBridges == 0) {
+			bridgeMsg = [bridgeMsg stringByAppendingString:@"\nNo bridges currently configured."];
+		} else {
+			bridgeMsg = [bridgeMsg stringByAppendingString:[NSString stringWithFormat:@"\nCurrently Using %ld Bridge",
+								   (unsigned long)numBridges]];
+			if (numBridges > 1) {
+				bridgeMsg = [bridgeMsg stringByAppendingString:@"s"];
+			}
+		}
+		return bridgeMsg;
+	} else
         return nil;
 }
 
@@ -168,7 +179,7 @@
         } else if (indexPath.row == 1) {
             cell.textLabel.text = @"Block Third-Party";
         } else if (indexPath.row == 2) {
-            cell.textLabel.text = @"Block All";
+            cell.textLabel.text = @"Disable Cookies";
         }
     } else if (indexPath.section == 3) {
         // User-Agent
@@ -198,14 +209,14 @@
                 cell.accessoryType = UITableViewCellAccessoryNone;
             }
         } else if (indexPath.row == 3) {
-            cell.textLabel.text = @"Windows 7 (NT 6.1), Firefox 24";
+            cell.textLabel.text = @"Windows 7 (NT 6.1), Firefox 45";
             if (spoofUserAgent == UA_SPOOF_WIN7_TORBROWSER) {
                 cell.accessoryType = UITableViewCellAccessoryCheckmark;
             } else {
                 cell.accessoryType = UITableViewCellAccessoryNone;
             }
         } else if (indexPath.row == 4) {
-            cell.textLabel.text = @"Mac OS X 10.9.2, Safari 7.0.3";
+            cell.textLabel.text = @"Mac OS X 10.11.6, Safari 9.1.2";
             if (spoofUserAgent == UA_SPOOF_SAFARI_MAC) {
                 cell.accessoryType = UITableViewCellAccessoryCheckmark;
             } else {
@@ -262,27 +273,9 @@
             }
         }
     } else if (indexPath.section == 6) {
-        AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-        
-        NSFetchRequest *request = [[NSFetchRequest alloc] init];
-        NSEntityDescription *entity = [NSEntityDescription entityForName:@"Bridge" inManagedObjectContext:appDelegate.managedObjectContext];
-        [request setEntity:entity];
-        
-        NSError *error = nil;
-        NSMutableArray *mutableFetchResults = [[appDelegate.managedObjectContext executeFetchRequest:request error:&error] mutableCopy];
-        if (mutableFetchResults == nil) {
-            // Handle the error.
-        }
-
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        NSUInteger numBridges = [mutableFetchResults count];
-        if (numBridges == 0) {
-            cell.textLabel.text = @"Not Using Bridges";
-        } else {
-            cell.textLabel.text = [NSString stringWithFormat:@"%ld Bridges Configured",
-                                   (unsigned long)numBridges];
-        }
+        cell.textLabel.text = @"Configure Bridges";
     }
     
     return cell;
@@ -425,14 +418,9 @@
             [appDelegate saveSettings:settings];
         }
     } else if (indexPath.section == 6) {
-        BridgeViewController *bridgesVC = [[BridgeViewController alloc] init];
-        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:bridgesVC];
-        navController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        [self presentViewController:navController animated:YES completion:nil];
+        BridgeViewController *bridgesVC = [[BridgeViewController alloc] initWithStyle:UITableViewStyleGrouped];
+		[self.navigationController pushViewController:bridgesVC animated:YES];
     }
     [tableView reloadData];
 }
-
-
-
 @end
