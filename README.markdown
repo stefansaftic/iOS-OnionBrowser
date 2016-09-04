@@ -1,8 +1,8 @@
 ## Onion Browser
 
-[![Build Status](https://travis-ci.org/OnionBrowser/iOS-OnionBrowser.png)](https://travis-ci.org/OnionBrowser/iOS-OnionBrowser)  
-[Official Site][official] | [Support][help] | [Changelog][changelog]  
-&copy; 2012-2015 [Mike Tigas][miketigas] ([@mtigas](https://twitter.com/mtigas))  
+[![Build Status](https://travis-ci.org/mtigas/iOS-OnionBrowser.svg?branch=master)](https://travis-ci.org/mtigas/iOS-OnionBrowser)  
+[Official Site][official] | [Support][help] | [Changelog][changelog] | [Donate][donate]  
+&copy; 2012-2016 [Mike Tigas][miketigas] ([@mtigas](https://twitter.com/mtigas))  
 [MIT License][license]
 
 A minimal, open-source web browser for iOS that tunnels web traffic through
@@ -11,19 +11,25 @@ and App Store links.
 
 ---
 
-* **OnionBrowser**: 1.5.13 (20151022.3) — [See changelog][changelog]
-* **[Tor][tor]**: 0.2.6.10 (Jul 12 2015)
+* **OnionBrowser**: 1.6.2 (20160824.1) - See [official release history][releases] and [changelog][changelog].
+* **[Tor][tor]**: 0.2.8.7 (Aug 24 2016)
+* **[iObfs][iobfs]**: 26463e2 (Jul 15 2016)
+  * **obfs4proxy**: 0.0.7-dev, upstream 6205762 (Jul 10 2016)
+  * **golang**: 1.7 (Aug 15 2016)
 * **[libevent][libevent]**: 2.0.22-stable (Jan 05 2015)
-* **[OpenSSL][openssl]**: 1.0.2d (Jul 09 2015)
+* **[OpenSSL][openssl]**: 1.0.2h (May 03 2016)
 
 [official]: https://mike.tig.as/onionbrowser/
 [help]: https://mike.tig.as/onionbrowser/help/
+[releases]: https://github.com/OnionBrowser/iOS-OnionBrowser/releases
 [changelog]: https://raw.github.com/OnionBrowser/iOS-OnionBrowser/master/CHANGES.txt
+[donate]: https://mike.tig.as/onionbrowser/#support-project
 [miketigas]: https://mike.tig.as/
 [license]: https://github.com/OnionBrowser/iOS-OnionBrowser/blob/master/LICENSE
 [tor]: https://www.torproject.org/
 [libevent]: http://libevent.org/
 [openssl]: https://www.openssl.org/
+[iobfs]: https://github.com/mtigas/iObfs
 
 <a href="https://d2p12wh0p3fo1n.cloudfront.net/files/20120918/a.png"><img src="https://d2p12wh0p3fo1n.cloudfront.net/files/20120918/a-100.jpg" width="100"/></a>
 <a href="https://d2p12wh0p3fo1n.cloudfront.net/files/20120918/b.png"><img src="https://d2p12wh0p3fo1n.cloudfront.net/files/20120918/b-100.jpg" width="100"/></a>

@@ -1,3 +1,6 @@
+Iobfs4proxy.framework/
+iobfs/
+
 # Xcode
 build/*
 *.pbxuser

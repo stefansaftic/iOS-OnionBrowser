@@ -2,21 +2,116 @@ Onion Browser Version History (since 1.2.2)
 
 FUTURE:
 
-===== 2.0 - Under Development =====
-Est. Release: February 2015
+===== 2.0 - Planned =====
 Features subject to change.
 
-* New "flat" icon for the iOS 7+ era.
+* New design and new codebase, based on the Endless Browser open source
+  project by jcs, used with permission; many thanks to jcs for allowing us
+  to build off of his work. Major highlights:
 
-* Tabbed browsing.
+  - Tabbed browsing.
 
-* Data encryption with an app-level password. Supplements current
+* New "flat" icon.
+
+? Minimum required iOS version is now iOS 9.0 (was iOS 8.2).
+
+? Data encryption with an app-level password. Supplements current
   encryption done by the iOS operating system, improving protection
   against forensic tools.
 
+
+===== 1.6.2 - Pending App Store Approval =====
+Aug 24 2016 - Submit Date
+
+* Tor updated to 0.2.8.7, containing several important security fixes:
+  https://blog.torproject.org/blog/tor-0287-released-important-fixes
+
+
+
 CURRENT VERSION:
 
-===== 1.5.13 - In App Store =====
+===== 1.6.1 - In App Store =====
+Aug 18 2016 - Submit Date
+Aug 19 2016 - App Store Availability
+
+* iObfs rebuilt with golang 1.7 (was 1.7rc3). Fixes crash-on-start when using
+  iOS 10 Beta.
+
+
+
+PREVIOUS VERSIONS:
+
+===== 1.6.0 =====
+Aug 04 2016 - Submit Date
+Aug 07 2016 - App Store Availability
+
+* iObfs integration: Onion Browser now supports several "pluggable transport"
+  bridge types, including obfs4, meek, and other PT bridge types,
+  meaning Onion Browser should connect more successfully in more locations
+  that block Tor. Special thanks to The Guardian Project for helping support
+  this work. For more info about iObfs (an obfs4proxy iOS port), please visit:
+  https://github.com/mtigas/iObfs
+
+* Bridge user interface overhaul: Onion Browser now comes with the same default
+  bridges for obfs4, meek-amazon, and meek-azure, as the Tor Browser Bundle and
+  Orbot. An easier-to-use bridge page allows users to select the defaults with
+  "one click" and without having to manually edit bridge config lines.
+
+* User-agent spoofing strings updated to the latest versions: iOS 9 Safari,
+  macOS El Capitan Safari (9.1.1), Tor Browser Bundle 6.0 (Windows 7,
+  Firefox 45).
+
+* Tor updated to 0.2.8.6, the first stable release in the 0.2.8 series.
+  This version contains several performance and security improvements.
+  https://blog.torproject.org/blog/tor-0286-released
+  https://gitweb.torproject.org/tor.git/tree/ChangeLog?h=tor-0.2.8.5-rc
+
+* OpenSSL updated to 1.0.2h.
+  https://www.openssl.org/news/secadv/20160503.txt
+  https://openssl.org/news/changelog.html
+
+* Minimum required iOS version is now iOS 8.2 (was iOS 8.0). Support for iOS
+  8.X will continue until Onion Browser 2.0 is released.
+
+===== 1.5.16 =====
+Dec 29 2015 - Submit Date
+Jan 07 2016 - App Store Availability
+
+* Tor updated to 0.2.7.6.
+https://gitweb.torproject.org/tor.git/tree/ChangeLog?h=tor-0.2.7.6
+
+===== 1.5.15 =====
+Dec 03 2015 - Submit Date
+Dec 10 2015 - App Store Availability
+
+* Tor updated to 0.2.7.5, the first stable release in the new
+  Tor 0.2.7 series.
+  https://gitweb.torproject.org/tor.git/tree/ChangeLog?h=tor-0.2.7.5
+
+* OpenSSL updated to 1.0.2e, fixing several security issues.
+  https://openssl.org/news/secadv/20151203.txt
+  https://openssl.org/news/changelog.html
+
+===== 1.5.14 =====
+Oct 31 2015 - Submit Date
+Nov 08 2015 - App Store Availability
+
+* FIX: Crash when pressing menu button on iPad.
+
+* FIX: GREATLY improve the Onion Browser experience when coming back from
+  background. Despite my best efforts to fix the problem, there was a minor
+  code bug regarding "appDidBecomeActive" that went unnoticed for a very
+  long time. BIG thanks to RustamDz who pointed out the relevant code
+  error. (#2 #59)
+
+* Tor updated to 0.2.7.4-rc. This future-proofs Onion Browser a bit
+  by supporting stronger Ed25519 encryption keys. The 0.2.7 series also
+  improves recovery when the clock jumps -- which likely also improves
+  Onion Browser's chances of continuing successfully when coming back
+  from background.
+  https://gitweb.torproject.org/tor.git/tree/ChangeLog?h=tor-0.2.7.4-rc
+
+===== 1.5.13 =====
 Oct 22 2015 - Submit Date
 Oct 30 2015 - App Store Availability
 
@@ -50,9 +145,6 @@ Oct 30 2015 - App Store Availability
 
 * OpenSSL updated to 1.0.2d.
   https://openssl.org/news/changelog.html
-
-
-PREVIOUS VERSIONS:
 
 ===== 1.5.12 =====
 Mar 20 2015 - Submit Date
